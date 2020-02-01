@@ -35,11 +35,11 @@ class App extends Component {
     let APIURL = `https://cors-anywhere.herokuapp.com/https://sgipsignal.com/sgipmoer/?ba=SGIP_CAISO_PGE&starttime=${this.state.now}&endtime=${this.state.fiveMinsFromNow}`;
     let data = await axios.get(APIURL, requestHeaders)
       .then((res) => {
-        console.log(res)
-        return res.data
-      })
-    this.setState({CO2Intensity: 0.5})
-
+        console.log(res['data'][0]['moer']);
+        let moer = res.data[0]['moer'];
+        let moer_normalized = moer/0.7;
+        this.setState({CO2Intensity: moer_normalized});
+      });
   }
 
   async componentDidMount() {
