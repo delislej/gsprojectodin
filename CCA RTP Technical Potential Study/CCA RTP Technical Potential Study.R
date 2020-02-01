@@ -133,9 +133,53 @@ rm(CAISO_RT5M_Demand, Complete_WattTime_Joined)
 # Joined_CAISO_WT <- readRDS(file.path(Code_WD, "Joined_CAISO_WattTime_2019.rds"))
 
 
+#### Estimate SVCE Total Demand ####
+# This data is not publicly available, so estimated using PG&E-TAC demand data from CAISO
+# scaled to match SVCE Oct 1, 2017 – Sept 30, 2018 annual load of 3.6 TWh/year given in Feb 2019 Board Workshop presentation, pg. 38.
+# https://www.svcleanenergy.org/wp-content/uploads/2019/02/Feb-2019-Board-Workshop_02-25-19-F.pdf
+
+Total_2019_PGE_TWh <- sum(Joined_CAISO_WT$PGE_Demand_MW)/(12 * 1000 * 1000) # 99 TWh
+
+Total_2017_2018_SVCE_TWh <- 3.6 # Total annual laod, in TWh
+
+Joined_CAISO_WT <- Joined_CAISO_WT %>%
+  mutate(SVCE_Demand_MW = PGE_Demand_MW * (Total_2017_2018_SVCE_TWh/Total_2019_PGE_TWh))
 
 
+#### Estimate Modified SVCE Load Profile ####
+# Assume that 50% of customers would be willing to switch to RTP rate (Innovators + Early Adopters + Early Majority)
+# Assume price elasticity of -0.2 (http://files.brattle.com/files/13955_estimating_the_impact_of_innovative_rate_designs.pdf, pg. 43)
 
+# Calculate average daily load.
+# Calculate average daily price.
+# Calculate % deviation from average daily price.
+# Multiply by 50% and -20% to get % change in load.
+# Multiply by average daily load to get MW change in load. (Check that this column sums to 0 MW).
+# Add to original load profile to get modified load profile.
 
+Joined_CAISO_WT <- Joined_CAISO_WT %>%
+  group_by(Date = as.Date(dttm, tz = "America/Los_Angeles")) %>%
+  mutate(Average_Daily_Demand = mean(SVCE_Demand_MW)) %>%
+  mutate(Average_Daily_Price = mean(LMP_RT5M)) %>%
+  ungroup() %>%
+  mutate(Percent_Deviation_From_Average_Daily_Price = (LMP_RT5M - Average_Daily_Price)/Average_Daily_Price) %>%
+  mutate(Demand_Change_Percent = 0.5 * -0.2 * Percent_Deviation_From_Average_Daily_Price) %>%
+  mutate(Demand_Change_Percent = pmax(Demand_Change_Percent, -0.5)) %>% # Demand can be reduced by no more than 50%.
+  mutate(Demand_Change_Percent = pmin(Demand_Change_Percent, 0.5)) %>% # Demand can be increased by no more than 50%.
+  mutate(Demand_Change_MW = Demand_Change_Percent * Average_Daily_Demand) %>%
+  mutate(Modified_SVCE_Demand_MW = SVCE_Demand_MW + Demand_Change_MW)
 
+Selected_Plot_Date <- as.Date("2019-06-11", tz = "America/Los_Angeles")
 
+ggplot(Joined_CAISO_WT %>% filter(Date == Selected_Plot_Date), aes(x = dttm)) + 
+  geom_line(aes(y = SVCE_Demand_MW, color = "Original SVCE Demand")) + 
+  geom_line(aes(y = Modified_SVCE_Demand_MW, color = "With 50% RTP Customers")) +
+  xlab("Date-Time") +
+  ylab("SVCE Demand (MW)") +
+  ylim(0, max(Joined_CAISO_WT$SVCE_Demand_MW)) +
+  labs(color = "Legend") +
+  ggtitle("Modeled SVCE RTP Load Profile Impact") +
+  theme(text = element_text(size = 15), plot.title = element_text(hjust = 0.5))
+
+ggsave(filename = file.path(Code_WD, "SVCE Technical Potential Study Load Profile Plot 2019-06-11.png"),
+       width = 11, height = 8.5, units = "in")
