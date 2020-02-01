@@ -8,11 +8,8 @@ class LevelTile extends Component {
     {
         super(props);
         this.state = {
-            stageCount:this.props.stageCount,
-            curLvl:0,
-            labelLvl:1,
-            data:props.progData,
-            series: [44, 55, 67],
+            data:props.Data,
+            series: [44, 55],
             options: {
                 chart: {
                     type: 'radialBar',
@@ -26,7 +23,7 @@ class LevelTile extends Component {
                                 fontSize: '11px',
                             },
                             value: {
-                                fontSize: '8px',
+                                fontSize: '18px',
                             },
                             total: {
                                 show: true,
@@ -44,43 +41,7 @@ class LevelTile extends Component {
         }
     }
 
-    right = () => {
-        if(this.state.curLvl+1 > this.props.level.length-1)
-        {
 
-        }
-        else
-        {
-            let newLvl = this.state.curLvl;
-            let newLablLevel = this.state.labelLvl;
-            newLablLevel++;
-            newLvl++;
-            this.setState({
-                curLvl: newLvl,
-                labelLvl: newLablLevel
-            }, this.updateChart);
-        }
-
-    };
-
-   left = () => {
-       if(this.state.curLvl === 0)
-       {
-
-       }
-       else {
-           let newLvl = this.state.curLvl;
-           let newLablLevel = this.state.labelLvl;
-           newLablLevel--;
-           newLvl--;
-           this.setState({
-               curLvl: newLvl,
-               labelLvl: newLablLevel
-           }, this.updateChart);
-       }
-
-
-    };
 
     updateChart = () => {
 
@@ -120,21 +81,10 @@ class LevelTile extends Component {
         chartBuffer.push(
 
 
-            <Grid container key={5321}>
 
-                <Grid item xs={6} style={{margin: 0}}>
-                    <div>
-                    <Chart options={x} series={[80,50,70]} type="radialBar"  width={300} height={250}  />
-                    </div>
-                </Grid>
-                <Grid item xs={1}>
+                    <Chart options={x} series={this.state.data} type="radialBar"  width={300} height={250}  />
 
-                </Grid>
 
-                <Grid item xs={3}>
-                   -
-                </Grid>
-            </Grid>
         );
 
         this.setState({buff:chartBuffer})
