@@ -45,6 +45,45 @@ Clean_CAISO_RT5M_Joined <- Raw_CAISO_RT5M_Joined %>%
 rm(Raw_CAISO_RT5M_Joined)
 
 
+#### Load, Clean, and Interpolate CAISO Demand Data ####
+
+setwd(file.path(Home_WD, "CAISO_Actual_Demand_Data"))
+
+CAISO_Demand_Files <- list.files(pattern = ".csv")
+
+Raw_CAISO_Demand_Joined <- data.frame(INTERVALSTARTTIME_GMT = character(), MW = numeric(), stringsAsFactors = F)
+
+for(CAISO_Demand_File in CAISO_Demand_Files){
+  
+  Raw_CAISO_Demand_Single <- read.csv(CAISO_Demand_File) %>%
+    filter(TAC_AREA_NAME == "PGE-TAC") %>%
+    select(INTERVALSTARTTIME_GMT, MW)
+  
+  Raw_CAISO_Demand_Joined <- rbind(Raw_CAISO_Demand_Joined, Raw_CAISO_Demand_Single)
+  
+}
+
+rm(Raw_CAISO_Demand_Single, CAISO_Demand_File, CAISO_Demand_Files)
+
+Clean_CAISO_Demand_Joined <- Raw_CAISO_Demand_Joined %>%
+  mutate(dttm = as.POSIXct(gsub("T", " ", substr(INTERVALSTARTTIME_GMT, 1, 16)), tz = "UTC")) %>%
+  mutate(dttm = with_tz(dttm, tz = "America/Los_Angeles")) %>%
+  mutate(PGE_Demand_MW = MW) %>% # Convert from $/MWh to $/kWh
+  select(dttm, PGE_Demand_MW) %>%
+  arrange(dttm)
+
+rm(Raw_CAISO_Demand_Joined)
+
+Interpolated_CAISO_Demand <- approx(Clean_CAISO_Demand_Joined$dttm, Clean_CAISO_Demand_Joined$PGE_Demand_MW, 
+                                     Clean_CAISO_RT5M_Joined$dttm, method="constant", rule = 2, f = 0)
+
+CAISO_RT5M_Demand <- Clean_CAISO_RT5M_Joined %>%
+  mutate(PGE_Demand_MW = Interpolated_CAISO_Demand$y)
+
+rm(Interpolated_CAISO_Demand, Clean_CAISO_Demand_Joined, Clean_CAISO_RT5M_Joined)
+
+
+
 #### Load and Clean WattTime SGIP Historical GHG Data ####
 
 setwd(file.path(Home_WD, "WattTime SGIP Historical GHG Data"))
@@ -81,6 +120,17 @@ Complete_WattTime_Joined <- data.frame(dttm = seq.POSIXt(from = as.POSIXct("2019
   mutate(moer = ifelse(is.na(moer), lag(moer, 12*24*7), moer)) # Fill with data from prior week.
 
 rm(Clean_WattTime_Joined)
+
+
+#### Join CAISO and WattTime Data ####
+
+Joined_CAISO_WT <- CAISO_RT5M_Demand %>%
+  left_join(Complete_WattTime_Joined, by = "dttm")
+
+rm(CAISO_RT5M_Demand, Complete_WattTime_Joined)
+
+# saveRDS(Joined_CAISO_WT, file.path(Code_WD, "Joined_CAISO_WattTime_2019.rds"))
+# Joined_CAISO_WT <- readRDS(file.path(Code_WD, "Joined_CAISO_WattTime_2019.rds"))
 
 
 
