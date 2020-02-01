@@ -3,8 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="1a4be026-9be7-4bb4-a18a-ac0b9b3180cd" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ChartTile.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/ChartTile.jsx" afterDir="false" />
     </list>
@@ -77,7 +76,7 @@
       <option name="presentableId" value="Default" />
       <updated>1580580028155</updated>
       <workItem from="1580580029401" duration="8242000" />
-      <workItem from="1580592332708" duration="214000" />
+      <workItem from="1580592332708" duration="4050000" />
     </task>
     <servers />
   </component>

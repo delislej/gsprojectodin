@@ -23,7 +23,7 @@ class LevelTile extends Component {
                                 fontSize: '11px',
                             },
                             value: {
-                                fontSize: '18px',
+                                fontSize: '8px',
                             },
                             total: {
                                 show: true,
@@ -66,7 +66,7 @@ class LevelTile extends Component {
                         },
                         total: {
                             show: true,
-                            label: this.state.labelLvl,
+                            label: this.props.label,
                             formatter: function (w) {
                                 // By default this function returns the average of all series. The below is just an example to show the use of custom formatter function
                                 return "";
@@ -75,7 +75,22 @@ class LevelTile extends Component {
                     }
                 }
             },
-            labels: ['C/KWh', 'CO2'],
+            labels: [this.props.label],
+            fill: {
+                colors: ['#23b75a'],
+                type: 'gradient',
+                gradient: {
+                    shade: 'dark',
+                    type: 'horizontal',
+                    shadeIntensity: 0.5,
+
+                    gradientToColors: ['#880c0b'],
+                    inverseColors: false,
+                    opacityFrom: 1,
+                    opacityTo: 1,
+                    stops: [0, 100]
+                }
+            }
         };
 
         chartBuffer.push(
