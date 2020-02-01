@@ -15,7 +15,6 @@ let requestHeaders =
     {
         headers: {
           'Authorization': 'Bearer ' + token,
-          'Access-Control-Allow-Origin': '*'
         }
     };
 
@@ -28,18 +27,22 @@ class App extends Component {
     showSignup: false,
     now: new Date().toISOString(),
     fiveMinsFromNow: addMinsToDate(new Date(), 5).toISOString(),
+    CO2Intensity: 0,
   };
 
 
-  handleRetrieveCO2Data = () => {
-    let APIURL = `https://sgipsignal.com/sgipmoer/?ba=SGIP_CAISO_PGE&starttime=${this.state.now}&endtime=${this.state.fiveMinsFromNow}`;
-    axios.get(APIURL, requestHeaders)
+  async handleRetrieveCO2Data() {
+    let APIURL = `https://cors-anywhere.herokuapp.com/https://sgipsignal.com/sgipmoer/?ba=SGIP_CAISO_PGE&starttime=${this.state.now}&endtime=${this.state.fiveMinsFromNow}`;
+    let data = await axios.get(APIURL, requestHeaders)
       .then((res) => {
         console.log(res)
+        return res.data
       })
+    this.setState({CO2Intensity: 0.5})
+
   }
 
-  componentDidMount = () => {
+  async componentDidMount() {
     this.handleRetrieveCO2Data()
   }
 
@@ -50,7 +53,7 @@ class App extends Component {
       <div className="App">
           <div className="chartContainer">
               <ChartTile Data={[50]} label="c/kWh" className="chart"/>
-              <ChartTile Data={[100]} label="CO2" className="chart"/>
+              <ChartTile Data={[this.state.CO2Intensity]} label="CO2" className="chart"/>
           </div>
   
       </div>
