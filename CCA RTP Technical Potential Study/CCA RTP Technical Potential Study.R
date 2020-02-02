@@ -183,3 +183,16 @@ ggplot(Joined_CAISO_WT %>% filter(Date == Selected_Plot_Date), aes(x = dttm)) +
 
 ggsave(filename = file.path(Code_WD, "SVCE Technical Potential Study Load Profile Plot 2019-06-11.png"),
        width = 11, height = 8.5, units = "in")
+
+
+##### Calculate Annual Wholesale Energy Cost Reduction from RTP ####
+
+# $137 million/year
+Annual_Wholesale_Energy_Cost_Original <- sum(Joined_CAISO_WT$SVCE_Demand_MW * (1000/12) * Joined_CAISO_WT$LMP_RT5M)
+
+# $127 million/year
+Annual_Wholesale_Energy_Cost_With_RTP <- sum(Joined_CAISO_WT$Modified_SVCE_Demand_MW * (1000/12) * Joined_CAISO_WT$LMP_RT5M)
+
+# 12,713 metric tons/year
+# MOER data is in metric tons/MWh, or kg/kWh.
+Annual_Marginal_GHG_Impact <- sum((Joined_CAISO_WT$SVCE_Demand_MW - Joined_CAISO_WT$Modified_SVCE_Demand_MW) * (1/12) * Joined_CAISO_WT$moer)
