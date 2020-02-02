@@ -69,7 +69,9 @@ class LevelTile extends Component {
                             label: this.props.label,
                             formatter: function (w) {
                                 // By default this function returns the average of all series. The below is just an example to show the use of custom formatter function
-                                return "";
+                                console.log(w)
+                                return '';
+                                
                             }
                         }
                     }
@@ -77,14 +79,14 @@ class LevelTile extends Component {
             },
             labels: [this.props.label],
             fill: {
-                colors: ['#23b75a'],
+                colors: [this.props.color],
                 type: 'gradient',
                 gradient: {
                     shade: 'dark',
                     type: 'horizontal',
                     shadeIntensity: 0.5,
 
-                    gradientToColors: ['#880c0b'],
+                    gradientToColors: [this.props.colorTo],
                     inverseColors: false,
                     opacityFrom: 1,
                     opacityTo: 1,
