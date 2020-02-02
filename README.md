@@ -1,6 +1,6 @@
 # Project Odin
 
-### Odin is an data platform for CCAs and LSEs that empowers electricity consumers with real time pricing data.
+### Odin is a data platform for CCAs and LSEs that empowers electricity consumers with real time pricing data.
 
 ### Consumers can view real time price information at 5 minute intervals, as well as the greenhouse gas (GHG) intensity of the grid. 
 
